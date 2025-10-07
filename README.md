@@ -40,7 +40,7 @@ Mac: Open the "Terminal" app, type cd , drag the dataset-downloader folder from 
 
 In the terminal, type the following command and press Enter:
 
-pip install -r requirements.txt
+pip install -r dependencies.txt
 
 ▶️ How to Run the Script
 Once the setup is complete, you can run the script anytime you need to download the data.
