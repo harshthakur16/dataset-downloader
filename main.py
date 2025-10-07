@@ -75,6 +75,12 @@ def save_data_to_csv(data_frame, file_path):
     """Saves the DataFrame to a CSV file."""
     if data_frame is not None:
         try:
+            # Get the directory part of the file path
+            directory = os.path.dirname(file_path)
+            # Create the directory if it doesn't exist
+            if directory:
+                os.makedirs(directory, exist_ok=True)
+                
             data_frame.to_csv(file_path, index=False)
             print(f"Data successfully saved to {file_path}")
         except Exception as e:
@@ -93,12 +99,19 @@ def main():
 
     base_url = "https://analytics.seekho.in/api/queries/41583/results.csv"
     full_url = f"{base_url}?api_key={api_key}"
-    output_file_name = "dataset.csv"
+    
+    # --- CHANGE: Define output directory and create full path ---
+    output_dir = "output"
+    output_filename = "dataset.csv"
+    # os.path.join creates a correct path like "output/dataset.csv"
+    output_filepath = os.path.join(output_dir, output_filename)
 
     csv_data = fetch_data(full_url)
     if csv_data:
         processed_data_frame = process_csv_data(csv_data)
-        save_data_to_csv(processed_data_frame, output_file_name)
+        # --- CHANGE: Pass the new full file path to the save function ---
+        save_data_to_csv(processed_data_frame, output_filepath)
 
 if __name__ == "__main__":
     main()
+
