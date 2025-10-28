@@ -97,7 +97,7 @@ def main():
         print("Please create a .env file and set your API_KEY.")
         return
 
-    base_url = "https://analytics.seekho.in/api/queries/41583/results.csv"
+    base_url = "https://analytics.seekho.in/api/queries/46930/results.csv"
     full_url = f"{base_url}?api_key={api_key}"
     
     # --- CHANGE: Define output directory and create full path ---
