@@ -37,7 +37,7 @@ def process_csv_data(csv_content):
         # Split the 'ad_creative' column into new columns.
         # n=5 ensures that we split at most 5 times, leaving the rest in the last column.
         # This handles cases where 'otherData' might contain underscores.
-        split_columns = ad_creative_series.str.split('_', n=5, expand=True)
+        split_columns = ad_creative_series.str.split('_', n=4, expand=True)
 
         # Create new columns with camelCase names
         new_column_names = {
@@ -45,8 +45,7 @@ def process_csv_data(csv_content):
             1: 'scriptName',
             2: 'actorName',
             3: 'formatName',
-            4: 'uploadDate',
-            5: 'otherData'
+            4: 'otherData'
         }
         df_new_columns = split_columns.rename(columns=new_column_names)
 
