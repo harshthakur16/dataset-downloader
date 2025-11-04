@@ -3,6 +3,7 @@ import requests
 import pandas as pd
 from io import StringIO
 from dotenv import load_dotenv
+import sqlite3
 
 def fetch_data(url):
     """Fetches data from the given URL and returns the content."""
@@ -85,6 +86,31 @@ def save_data_to_csv(data_frame, file_path):
         except Exception as e:
             print(f"Could not save the file. Error: {e}")
 
+def save_df_to_sqlite(data_frame, db_file_path, table_name):
+    """Saves the DataFrame to a SQLite database table."""
+    if data_frame is None:
+        print("No data to save to SQLite.")
+        return
+
+    print(f"Saving data to SQLite table '{table_name}'...")
+    try:
+        # Get the directory part of the file path
+        directory = os.path.dirname(db_file_path)
+        # Create the directory if it doesn't exist
+        if directory:
+            os.makedirs(directory, exist_ok=True)
+            
+        conn = sqlite3.connect(db_file_path)
+        # Save the DataFrame to the specified table
+        data_frame.to_sql(table_name, conn, if_exists='replace', index=False)
+        conn.close()
+        print(f"Data successfully saved to table '{table_name}' in {db_file_path}")
+    
+    except sqlite3.Error as e:
+        print(f"An error occurred with the SQLite database: {e}")
+    except Exception as e:
+        print(f"Could not save the database. Error: {e}")
+
 def main():
     """Main function to orchestrate the download, processing, and saving."""
     # Load environment variables from a .env file
@@ -99,18 +125,27 @@ def main():
     base_url = "https://analytics.seekho.in/api/queries/46930/results.csv"
     full_url = f"{base_url}?api_key={api_key}"
     
-    # --- CHANGE: Define output directory and create full path ---
+    # --- Define output directory and file paths ---
     output_dir = "output"
-    output_filename = "dataset.csv"
-    # os.path.join creates a correct path like "output/dataset.csv"
-    output_filepath = os.path.join(output_dir, output_filename)
+    csv_filename = "dataset.csv"
+    db_filename = "dataset.db"
+    table_name = "campaigns"  # Table name from your snippet
+    
+    csv_filepath = os.path.join(output_dir, csv_filename)
+    db_filepath = os.path.join(output_dir, db_filename)
 
     csv_data = fetch_data(full_url)
     if csv_data:
         processed_data_frame = process_csv_data(csv_data)
-        # --- CHANGE: Pass the new full file path to the save function ---
-        save_data_to_csv(processed_data_frame, output_filepath)
+        
+        if processed_data_frame is not None:
+            # 1. Save to CSV
+            save_data_to_csv(processed_data_frame, csv_filepath)
+            
+            # 2. --- NEW: Save to SQLite ---
+            save_df_to_sqlite(processed_data_frame, db_filepath, table_name)
+        else:
+            print("Processing failed. No data to save.")
 
 if __name__ == "__main__":
     main()
-
